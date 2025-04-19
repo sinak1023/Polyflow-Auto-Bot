@@ -9,6 +9,25 @@ const path = require('path');
 
 const API_BASE_URL = 'https://api-v2.polyflow.tech/api/scan2earn';
 
+const getHeaders = (token) => ({
+  Authorization: token,
+  Accept: 'application/json, text/plain, */*',
+  'Accept-Encoding': 'gzip, deflate, br, zstd',
+  'Accept-Language': 'en-US,en;q=0.9,id;q=0.8',
+  'Cache-Control': 'no-cache',
+  Origin: 'https://app.polyflow.tech',
+  Pragma: 'no-cache',
+  Priority: 'u=1, i',
+  Referer: 'https://app.polyflow.tech/',
+  'Sec-CH-UA': '"Google Chrome";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
+  'Sec-CH-UA-Mobile': '?0',
+  'Sec-CH-UA-Platform': '"macOS"',
+  'Sec-Fetch-Dest': 'empty',
+  'Sec-Fetch-Mode': 'cors',
+  'Sec-Fetch-Site': 'same-site',
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36',
+});
+
 const readTokens = async () => {
   try {
     const data = await fs.readFile(path.join(__dirname, 'token.txt'), 'utf8');
@@ -46,14 +65,11 @@ const getRandomProxy = (proxies) => {
 };
 
 const getRandomItem = (array) => array[Math.floor(Math.random() * array.length)];
-
 const getRandomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
 const getRandomFloat = (min, max, decimals = 2) => {
   const num = Math.random() * (max - min) + min;
   return parseFloat(num.toFixed(decimals));
 };
-
 const getRandomDate = () => {
   const now = new Date();
   const daysAgo = getRandomInt(0, 30);
@@ -61,16 +77,13 @@ const getRandomDate = () => {
   randomDate.setDate(now.getDate() - daysAgo);
   return randomDate.toLocaleDateString();
 };
-
 const getRandomName = () => {
   const firstNames = ['John', 'Jane', 'Mike', 'Emma', 'David', 'Sarah', 'Robert', 'Linda', 'William', 'Emily', 
                       'James', 'Olivia', 'Alex', 'Sophia', 'Daniel', 'Mia', 'Thomas', 'Ava', 'Joseph', 'Isabella'];
   const lastNames = ['Smith', 'Johnson', 'Brown', 'Taylor', 'Miller', 'Wilson', 'Moore', 'Jackson', 'Martin', 'Lee',
                      'Davis', 'White', 'Harris', 'Clark', 'Lewis', 'Young', 'Walker', 'Hall', 'Allen', 'Wright'];
-  
   return `${getRandomItem(firstNames)} ${getRandomItem(lastNames)}`;
 };
-
 const getRandomAddress = () => {
   const streets = ['Main St', 'Oak Ave', 'Maple Rd', 'Cedar Ln', 'Pine Dr', 'Elm St', 'Washington Ave', 
                   'Park Rd', 'Lake Dr', 'River Rd', 'Forest Ave', 'Broadway', 'Highland Ave', 'Sunset Blvd'];
@@ -78,10 +91,8 @@ const getRandomAddress = () => {
                  'San Antonio', 'San Diego', 'Dallas', 'San Jose', 'Austin', 'Boston', 'Seattle'];
   const states = ['NY', 'CA', 'IL', 'TX', 'AZ', 'PA', 'FL', 'OH', 'MI', 'GA', 'NC', 'WA', 'MA'];
   const zipCodes = Array.from({ length: 5 }, () => getRandomInt(0, 9)).join('');
-  
   return `${getRandomInt(1, 9999)} ${getRandomItem(streets)}, ${getRandomItem(cities)}, ${getRandomItem(states)} ${zipCodes}`;
 };
-
 const getRandomProducts = (count = getRandomInt(1, 5)) => {
   const productNames = [
     'Desktop Computer', 'Laptop', 'Monitor', 'Keyboard', 'Mouse', 'Headphones', 'Speakers', 'Printer',
@@ -90,80 +101,62 @@ const getRandomProducts = (count = getRandomInt(1, 5)) => {
     'Scanner', 'Server', 'Network Switch', 'UPS Battery Backup', 'Toner Cartridge', 'Phone System',
     'Webcam', 'Microphone', 'Graphics Card', 'RAM Module', 'CPU', 'Power Supply'
   ];
-  
   const products = [];
   const usedProducts = new Set();
-  
   for (let i = 0; i < count; i++) {
     let productName;
     do {
       productName = getRandomItem(productNames);
     } while (usedProducts.has(productName));
-    
     usedProducts.add(productName);
-    
     products.push({
       desc: productName,
       qty: getRandomInt(1, 10),
       price: getRandomFloat(10, 1000)
     });
   }
-  
   return products;
 };
-
 const generateFileName = () => {
   const randomString = Math.random().toString(36).substring(2, 12);
   const timestamp = Date.now();
   return `invoice-${timestamp}-${randomString}.png`;
 };
-
 const generateInvoice = () => {
   const canvas = createCanvas(600, 800);
   const ctx = canvas.getContext('2d');
-
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = '#000000';
-
   ctx.font = 'bold 30px Arial';
   const companyNames = ['TechSupply Inc.', 'Global Systems', 'Infinity Tech', 'Digital Solutions', 'Smart Services'];
   const companyName = getRandomItem(companyNames);
   ctx.fillText(companyName, 50, 50);
-
   ctx.font = '12px Arial';
   ctx.fillText(`Phone: ${getRandomInt(100, 999)}-${getRandomInt(100, 999)}-${getRandomInt(1000, 9999)}`, 50, 70);
   ctx.fillText(`Email: info@${companyName.toLowerCase().replace(/\s+/g, '')}.com`, 50, 85);
-
   ctx.font = 'bold 24px Arial';
   ctx.fillText('INVOICE', 450, 50);
-
   const invoiceId = `INV-${getRandomInt(10000, 99999)}`;
   const invoiceDate = getRandomDate();
   ctx.font = '16px Arial';
   ctx.fillText(`Invoice #: ${invoiceId}`, 400, 80);
   ctx.fillText(`Date: ${invoiceDate}`, 400, 100);
-
   const customerName = getRandomName();
   const customerAddress = getRandomAddress();
-  
   ctx.font = 'bold 18px Arial';
   ctx.fillText('BILL TO:', 50, 130);
   ctx.font = '16px Arial';
   ctx.fillText(customerName, 50, 155);
-
   const addressParts = customerAddress.split(', ');
   ctx.fillText(addressParts[0], 50, 175);
   ctx.fillText(addressParts.slice(1).join(', '), 50, 195);
-
   ctx.font = 'bold 18px Arial';
   ctx.fillText('PAYMENT DETAILS:', 400, 130);
   ctx.font = '16px Arial';
-  
   const paymentMethods = ['Credit Card', 'Bank Transfer', 'PayPal', 'Check', 'Cash'];
   ctx.fillText(`Method: ${getRandomItem(paymentMethods)}`, 400, 155);
   ctx.fillText(`Due Date: ${getRandomDate()}`, 400, 175);
-
   ctx.fillStyle = '#f0f0f0';
   ctx.fillRect(50, 230, 500, 30);
   ctx.fillStyle = '#000000';
@@ -172,12 +165,10 @@ const generateInvoice = () => {
   ctx.fillText('Qty', 280, 250);
   ctx.fillText('Price', 340, 250);
   ctx.fillText('Total', 480, 250);
-
   ctx.font = '14px Arial';
   const items = getRandomProducts();
   let y = 280;
   let grandTotal = 0;
-  
   items.forEach((item) => {
     const total = item.qty * item.price;
     grandTotal += total;
@@ -187,28 +178,21 @@ const generateInvoice = () => {
     ctx.fillText(`$${total.toFixed(2)}`, 480, y);
     y += 30;
   });
-
   const taxRate = getRandomFloat(0, 0.1);
   const tax = grandTotal * taxRate;
-  
   y += 20;
   ctx.fillRect(340, y - 10, 210, 1); 
-  
   ctx.fillText('Subtotal:', 400, y + 10);
   ctx.fillText(`$${grandTotal.toFixed(2)}`, 480, y + 10);
-  
   ctx.fillText(`Tax (${(taxRate * 100).toFixed(1)}%):`, 400, y + 40);
   ctx.fillText(`$${tax.toFixed(2)}`, 480, y + 40);
-  
   ctx.font = 'bold 16px Arial';
   ctx.fillText('TOTAL:', 400, y + 70);
   ctx.fillText(`$${(grandTotal + tax).toFixed(2)}`, 480, y + 70);
-  
   y += 100;
   ctx.font = 'bold 16px Arial';
   ctx.fillText('Notes:', 50, y);
   ctx.font = '14px Arial';
-  
   const notes = [
     'Payment due within 30 days.',
     'Please include invoice number on your payment.',
@@ -216,54 +200,42 @@ const generateInvoice = () => {
     'For questions, contact our accounting department.',
     'A late fee of 1.5% will be applied to overdue invoices.'
   ];
-  
   notes.forEach((note, index) => {
     ctx.fillText(note, 50, y + 25 + (index * 20));
   });
-  
   return canvas.toBuffer('image/png');
 };
 
-const getPresignedUrl = async (fileName, token, proxy) => {
-  const headers = {
-    'accept': 'application/json, text/plain, */*',
-    'accept-language': 'en-US,en;q=0.6',
-    'authorization': token,
-    'content-type': 'application/json',
-    'sec-ch-ua': '"Brave";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Windows"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-site',
-    'sec-gpc': '1',
-    'Referer': 'https://app.polyflow.tech/',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-  };
+const getPresignedUrl = async (fileName, token, proxy, retryCount = 3) => {
+  const headers = getHeaders(token);
   try {
     const response = await axios.get(`${API_BASE_URL}/get_presigned_url?file_name=${fileName}`, {
       headers,
       httpsAgent: proxy ? new HttpsProxyAgent(proxy) : undefined,
     });
     
-    if (response.data?.msg?.presigned_url) {
-      const urlStart = response.data.msg.presigned_url.substring(0, 30);
-      console.log(chalk.white(`  📝 Got presigned URL: ${urlStart}... (key: ${response.data.msg.key})`));
-    } else {
-      console.log(chalk.white(`  📝 Got presigned URL response`));
-    }
-    
     if (!response.data?.msg?.presigned_url || !response.data?.msg?.key) {
       throw new Error('Invalid presigned URL response');
     }
+    
     const url = response.data.msg.presigned_url;
     const key = response.data.msg.key;
     if (!url.startsWith('https://')) {
       throw new Error(`Invalid URL format: ${url}`);
     }
+    
+    console.log(chalk.white(`  📝 Got presigned URL: ${url.substring(0, 30)}... (key: ${key})`));
     return { url, key };
   } catch (error) {
     console.error(chalk.red(`  ❌ Error getting presigned URL: ${error.message}`));
+    if (error.response?.data?.err_code === 1000030 && retryCount > 0) {
+      console.warn(chalk.yellow(`  ⚠️ Retrying (${retryCount} attempts left)...`));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return await getPresignedUrl(fileName, token, proxy, retryCount - 1);
+    }
+    if (error.response) {
+      console.error(chalk.red(`  ℹ️ Server response: ${JSON.stringify(error.response.data)}`));
+    }
     throw error;
   }
 };
@@ -284,22 +256,8 @@ const uploadInvoice = async (presignedUrl, fileBuffer, proxy) => {
   }
 };
 
-const saveInvoice = async (invoicePath, token, proxy) => {
-  const headers = {
-    'accept': 'application/json, text/plain, */*',
-    'accept-language': 'en-US,en;q=0.6',
-    'authorization': token,
-    'content-type': 'application/json',
-    'sec-ch-ua': '"Brave";v="135", "Not-A.Brand";v="8", "Chromium";v="135"',
-    'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"Windows"',
-    'sec-fetch-dest': 'empty',
-    'sec-fetch-mode': 'cors',
-    'sec-fetch-site': 'same-site',
-    'sec-gpc': '1',
-    'Referer': 'https://app.polyflow.tech/',
-    'Referrer-Policy': 'strict-origin-when-cross-origin',
-  };
+const saveInvoice = async (invoicePath, token, proxy, retryCount = 3) => {
+  const headers = getHeaders(token);
   try {
     const response = await axios.post(`${API_BASE_URL}/save_invoice`, {
       invoice_path: invoicePath,
@@ -310,6 +268,14 @@ const saveInvoice = async (invoicePath, token, proxy) => {
     console.log(chalk.green('  ✅ Invoice saved successfully'));
   } catch (error) {
     console.error(chalk.red(`  ❌ Error saving invoice: ${error.message}`));
+    if (error.response?.data?.err_code === 1000030 && retryCount > 0) {
+      console.warn(chalk.yellow(`  ⚠️ Retrying (${retryCount} attempts left)...`));
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return await saveInvoice(invoicePath, token, proxy, retryCount - 1);
+    }
+    if (error.response) {
+      console.error(chalk.red(`  ℹ️ Server response: ${JSON.stringify(error.response.data)}`));
+    }
     throw error;
   }
 };
@@ -379,8 +345,8 @@ const main = async () => {
     const success = await processInvoice(token, proxy, i, scanCount);
     if (success) successfulScans++;
     if (i < scanCount) {
-      console.log(chalk.white('  ⏱️ Waiting 1 second before next scan...'));
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log(chalk.white('  ⏱️ Waiting 3 seconds before next scan...'));
+      await new Promise(resolve => setTimeout(resolve, 3000));
     }
   }
 
